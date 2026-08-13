@@ -6,11 +6,37 @@ import base64
 import requests
 import streamlit as st
 import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+ENV_PATH = BASE_DIR / ".env"
+
+
+def load_env_file():
+    if not ENV_PATH.exists():
+        return
+    for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.strip().startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        os.environ.setdefault(key, value)
+
+
+load_env_file()
+
 # ==========================================
 # ⚙️ [백엔드] CLOVA Chatbot 연동 정보
 # ==========================================
-NCP_CHATBOT_URL = os.environ.get("NCP_CHATBOT_URL", "https://ewzgmo6gyf.apigw.ntruss.com/custom/v1/19241/09e0ce15be9461a29cc72ff3ad60f47b80ec411176a2fd244219c364a6175d89")
-NCP_CHATBOT_SECRET = os.environ.get("NCP_CHATBOT_SECRET", "c3JMZkZHV2FRTkVUcUZEclhjdXJCSm1wWkR5WWFvUUE=")
+NCP_CHATBOT_URL = os.environ.get("NCP_CHATBOT_URL") or ""
+NCP_CHATBOT_SECRET = os.environ.get("NCP_CHATBOT_SECRET") or ""
+
+if not NCP_CHATBOT_URL or not NCP_CHATBOT_SECRET:
+    raise RuntimeError(
+        "Missing required environment variables: NCP_CHATBOT_URL, NCP_CHATBOT_SECRET. "
+        "Create a .env file in the project root with the required values."
+    )
 
 
 def render_fixed_logo(image_path: str = "logo.png", size_px: int = 48):

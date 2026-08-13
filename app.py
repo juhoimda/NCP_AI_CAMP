@@ -1,21 +1,47 @@
 # app.py
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from typing import List
+from pathlib import Path
 import requests
 import json
 import chromadb
 import uuid
 import time
+import os
+
+BASE_DIR = Path(__file__).resolve().parent
+ENV_PATH = BASE_DIR / ".env"
+
+
+def load_env_file():
+    if not ENV_PATH.exists():
+        return
+    for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.strip().startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        os.environ.setdefault(key, value)
+
+
+load_env_file()
 
 app = FastAPI(title="Bank Pilot AI 서류 심사 코어 API 엔진")
 
 # ==========================================
 # [설정 정보] NCP 인증 정보 세팅
 # ==========================================
-CLOVA_STUDIO_API_KEY = "nv-38d2a14af72546d28b2593916316adc7y4ry"
-RAG_API_URL = "https://clovastudio.stream.ntruss.com/v1/api-tools/rag-reasoning"
-REAL_OCR_INVOKE_URL = "https://gnt7f4ki2k.apigw.ntruss.com/custom/v1/55418/b60ac93bb0e8c7195c54fb6abd8757a9ee9c4fe6be707de5122b272b48cf79e3/general"
-OCR_SECRET_KEY = "SFBDQ1VvTVdsck12dGZhQlhsZUNYRUdJZG9rU1d1UEk="
+CLOVA_STUDIO_API_KEY = os.environ.get("CLOVA_STUDIO_API_KEY") or ""
+RAG_API_URL = os.environ.get("RAG_API_URL", "https://clovastudio.stream.ntruss.com/v1/api-tools/rag-reasoning")
+REAL_OCR_INVOKE_URL = os.environ.get("REAL_OCR_INVOKE_URL", "")
+OCR_SECRET_KEY = os.environ.get("OCR_SECRET_KEY") or ""
+
+if not CLOVA_STUDIO_API_KEY or not OCR_SECRET_KEY or not REAL_OCR_INVOKE_URL:
+    raise RuntimeError(
+        "Missing required environment variables: CLOVA_STUDIO_API_KEY, OCR_SECRET_KEY, REAL_OCR_INVOKE_URL. "
+        "Create a .env file in the project root with the required values."
+    )
 
 headers_clova = {
     "Authorization": f"Bearer {CLOVA_STUDIO_API_KEY}",
