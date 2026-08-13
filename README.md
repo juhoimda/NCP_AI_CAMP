@@ -2,6 +2,14 @@
 
 AI 기반 금융 서류 심사 및 금융 서류 가이드 챗봇 프로젝트입니다.
 
+
+<img width="1470" height="956" alt="스크린샷 2026-08-13 오후 4 22 26" src="https://github.com/user-attachments/assets/9a12356c-0d98-4cdb-8527-ac07b0e89c30" />
+<img width="1470" height="956" alt="스크린샷 2026-08-13 오후 4 28 36" src="https://github.com/user-attachments/assets/8c87efd4-7189-461f-8753-24e4d3cf1d0f" />
+
+
+[Uploading AI_Advanced_CHEM.COM_BANK PILOT.pdf…]()
+
+
 ## 실행 전 준비
 
 ### 1. 저장소 내려받기
